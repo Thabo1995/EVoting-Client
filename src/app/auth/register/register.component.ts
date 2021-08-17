@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/_services/auth.service';
 import { ViewChild, ElementRef} from '@angular/core';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
-// import { ToastrService } fom 'ngx-toastr';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -21,7 +21,11 @@ export class RegisterComponent implements OnInit {
   isLoggedIn = false;
   isCarOwner = false;
   submittedR = false;
-  state = '';
+
+  state : any;
+  information = true;
+  verify = false
+  finish = false
 
   constructor(
     private authService: AuthService,
@@ -30,10 +34,10 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private metaTagService: Meta,
     private  title: Title,
-    // private toastr: ToastrService,
+    private toastr: ToastrService,
 ) {
   this.form = this.formBuilder.group({
-    idNumber : ['', [ Validators.required,Validators.minLength(13),Validators.pattern('[0-9]*')]],
+    idNumber : ['', [ Validators.required, Validators.minLength(13), Validators.maxLength(13)]],
     email: ['', [ Validators.required, Validators.email]],
     password: ['', [ Validators.required]],
     password2: ['', [ Validators.required]]
@@ -47,12 +51,10 @@ export class RegisterComponent implements OnInit {
   get f() { return this.form.controls; }
 
 
-  onRegister(): void {
-
-    this.submittedR = true;
-
+  onSubmit(): void {
+    this.submitted = true;
     // stop here if form is invalid
-    if (this.registerForm.invalid) {
+    if (this.form.invalid) {
       return;
     }
 
@@ -61,8 +63,31 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
+    // check if username exists
+    this.authService.usernameExist(this.f.idNumber.value).subscribe(res => {
+      if(res.username_is_taken === true){
+        this.f.idNumber.setErrors({usernameExist:true})
+        console.log("yes")
+        return;
+      }
+    })
+  
+    
+    if(this.verify === false && this.information === true){
+      this.verify = true
+      this.information = false
+      return;
+    }
 
+    if(this.verify === true && this.information === false){
+      this.verify = false
+      this.finish = true
+      
+      return;
+    }
+
+    this.loading = true;
+    console.log('gfdhghfgdhfgh')
     // use the rest service here.
     const auth = {
       username: this.f.idNumber.value,
@@ -71,36 +96,28 @@ export class RegisterComponent implements OnInit {
       password2: this.f.password2.value,
     };
 
-    // check if username exists
-    this.authService.usernameExist(auth.username).subscribe(res => {
-      if(res.is_taken === true){
-        this.f.username.setErrors({usernameExist:true})
-        console.log(res)
-      }
-    })
+    
 
     this.authService.register(auth)
     .subscribe(res => {
       localStorage.setItem('token', res.key);
 
       if (res.status === 400 ){
-        // this.toastr.error('Oops', 'Something went wrong, cant use credentials');
-        console.log("+++++++++++++++")
+        this.toastr.error('Oops', 'Something went wrong, cant use credentials');
       }
 
       this.isLoggedIn = this.authService.isLoggedIn
       if (this.isLoggedIn === true){
-        // this.getUser()
-        // this.toastr.success('welcome to our platform','registration successful')
-        // this.closeAddRegisterModal.nativeElement.click()
+        this.getUser()
+        this.toastr.success('welcome to our platform','account registration successful')
+        return this.router.navigate(['vote'])
 
       }
 
       if (this.isLoggedIn === false){
-        console.log('failed>>>>>>..')
         console.log(res.values())
         if(res.error){
-          // this.toastr.error('Attempt failed,please try again. thanks','login failed')
+          this.toastr.error('Attempt failed,please try again. thanks','login failed')
         }
         
       }
@@ -108,9 +125,27 @@ export class RegisterComponent implements OnInit {
     }, err => {
       console.log(err);
       console.log("gdgdgdg");
-      // this.toastr.error('Something went wrong during registration, its our fault', 'Oops');
+      this.toastr.error('Something went wrong during registration, its our fault', 'Oops');
       this.loading = false;
     });
   }
+
+  getUser(): void {
+    this.authService.user().subscribe(
+      data => {
+        localStorage.setItem('user',JSON.stringify(data))
+      });
+  }
+
+  logout(): void {
+    // Clear all stored user info from device.
+    localStorage.clear()
+    sessionStorage.clear()
+    this.isLoggedIn = false
+    this.authService.isLoggedIn = false
+    this.toastr.success('You are successfully logged out','Great')
+    this.router.navigate([''])
+  }
+
 
 }

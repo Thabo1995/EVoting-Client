@@ -1,6 +1,6 @@
 <div class="col-md-6 offset-md-3 ">
     <main class="form-signin">
-        <form>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
             <h5>e-Vote.org</h5>
             <hr>
            <h1 class="h3 mb-3 fw-normal">Register Here</h1>
@@ -11,39 +11,54 @@
             <li class="active" id="confirm"><strong>Finish</strong></li>
         </ul> <!-- fieldsets -->
 
-          <h3>Complete Registration</h3>
+          <div *ngIf="finish !== false">
+            <h3>Complete Registration</h3>
           <p class="text-info">We have generated a string to use so we can protect your vote privacy, remember to coy and save it to your secure vault </p>
          
           <p><strong>wD37q@9x4570jnmvRu74</strong></p>
         
-          <div>
+          <hr>
+          click confirm and complete
+
+          <input class="w-100 btn btn-lg btn-primary" type="submit" value="Confirm and Complete">
+      
+          </div>
+
+          <div *ngIf="verify !== false">
+            Verify your identity
+
+            <p class="text-warning">This would ask you to confirm your names and some security details, the api is not available for small entreprice, for now skip to confirm for test purpose.</p>
+            <input class="w-100 btn btn-lg btn-primary" type="submit" value="Confirm and proceed">
+          </div>
+          
+          <div *ngIf="information !== false">
             <div class="form-floating">
-              <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+              <input type="email" class="form-control" formControlName="idNumber" [ngClass]="{ 'is-invalid': submitted && f.idNumber.errors }"  maxlength="13" id="floatingInput" placeholder="id num" numbersOnly>
               <label for="floatingInput">South African ID Number</label>
             </div>
             <div class="form-floating">
-              <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+              <input type="email" class="form-control" formControlName="email" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" id="floatingInput" placeholder="name@example.com">
               <label for="floatingInput">Your Email Address</label>
             </div>
             <div class="form-floating">
-              <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+              <input type="password" class="form-control" formControlName="password" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" id="floatingPassword" placeholder="Password">
               <label for="floatingPassword">Password</label>
             </div>
             <div class="form-floating">
-              <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+              <input type="password" class="form-control" formControlName="password2" [ngClass]="{ 'is-invalid': submitted && f.password2.errors }" id="floatingPassword" placeholder="Password">
               <label for="floatingPassword">Confirm Password</label>
             </div>
+
+            <input class="w-100 btn btn-lg btn-primary" type="submit" value="Proceed">
           </div>
          
-          <hr>
-          click confirm and complete
-      
+          
           <div class="checkbox mb-3">
             <label>
                ...
             </label>
           </div>
-          <button class="w-100 btn btn-lg btn-primary" type="submit">Confirm and Complete</button>
+          
           <p class="mt-5 mb-3 text-muted">© 2021</p>
         </form>
       </main>

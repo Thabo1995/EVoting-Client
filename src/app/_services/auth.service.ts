@@ -18,7 +18,7 @@ const options = {
 };
 
 
-const apiUrl = 'https://api.kabook.co.za/';
+const apiUrl = 'http://127.0.0.1:8000/';
 
 @Injectable({
   providedIn: 'root'
@@ -58,7 +58,7 @@ export class AuthService {
 
   
   user(): Observable<any> {
-    return this.http.get(apiUrl + 'api/cars/user-details/',httpOptions).pipe(
+    return this.http.get(apiUrl + 'api/user-details/',httpOptions).pipe(
       tap(_ => console.log('got user')),
       catchError(this.handleError('register', []))
     );
@@ -66,7 +66,7 @@ export class AuthService {
 
 
   usernameExist(username:string): Observable<any> {
-    return this.http.get(apiUrl + 'api/cars/validate-username/'+ username + '/',httpOptions).pipe(
+    return this.http.get(apiUrl + 'api/validate-username/'+ username + '/',httpOptions).pipe(
       tap(_ => console.log('>>')),
       catchError(this.handleError('register', []))
     );

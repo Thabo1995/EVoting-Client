@@ -14,8 +14,13 @@ import { BannerComponent } from './home/banner/banner.component';
 import { TimelineComponent } from './home/timeline/timeline.component';
 import { VotingStatusComponent } from './home/voting-status/voting-status.component';
 import { HomeComponent } from './home/home.component';
-import { HttpClientModule, HttpClientXsrfModule } from '@angular/common/http';
+import { HttpClientModule, HttpClientXsrfModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NumberDirective } from './_helper/numbers-only.directive';
+import { TokenInterceptor } from './interceptors/token.interceptor';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
+
 
 @NgModule({
   declarations: [
@@ -30,7 +35,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     FooterComponent,
     BannerComponent,
     TimelineComponent,
-    VotingStatusComponent
+    VotingStatusComponent,
+    NumberDirective
   ],
   imports: [
     BrowserModule,
@@ -41,10 +47,19 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
       headerName: 'X-CSRFToken',
      }
     ),
+    BrowserAnimationsModule,
     ReactiveFormsModule,
     FormsModule,
+
+    ToastrModule.forRoot(),
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

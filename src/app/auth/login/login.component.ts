@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/_services/auth.service';
 import { ViewChild, ElementRef} from '@angular/core';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
-// import { ToastrService } from 'ngx-toastr';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -29,12 +29,12 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private metaTagService: Meta,
     private  title: Title,
-    // private toastr: ToastrService,
+    private toastr: ToastrService,
     
   ) { 
 
     this.form = this.formBuilder.group({
-      idNumber: ['', [ Validators.required, Validators.maxLength(13)]],
+      idNumber: ['', [ Validators.required, Validators.minLength(13), Validators.maxLength(13)]],
       password: ['', [ Validators.required]]
     });
   }
@@ -59,34 +59,52 @@ export class LoginComponent implements OnInit {
 
     // use the rest service here.
     const auth = {
-      email: this.f.idNumber.value,
+      username: this.f.idNumber.value.toString(),
       password: this.f.password.value
     };
-
+    
+    console.log(auth)
     this.authService.login(auth)
     .subscribe(res => {
       localStorage.setItem('token', res.key);
 
-      // if (res.status === 400 ){
-      //   this.toastr.error('Something went wrong, cant use credentials','0ops');
-      // }
+      if (res.status === 400 ){
+        this.toastr.error('Something went wrong, cant use credentials','0ops');
+      }
 
       this.isLoggedIn = this.authService.isLoggedIn
       if (this.isLoggedIn === true){
-        // this.toastr.success('welcome back','login successful')
-        // this.closeAddExpenseModal.nativeElement.click()
-        // this.getUser()
+        this.toastr.success('welcome back','login successful')
+        this.getUser()
+        return this.router.navigate(['vote'])
+       
       }
 
       if (this.isLoggedIn === false){
-        // this.toastr.error('Attempt failed,Check credentials','login failed')
+        this.toastr.error('Attempt failed,Check credentials','login failed')
       }
       
     }, err => {
-      console.log(err);
-      console.log("gdgdgdg");
-      // this.toastr.error('Something went wrong be patient with us','Oops')
+      this.toastr.error('Something went wrong be patient with us','Oops')
       this.loading = false;
     });
   }
+
+  getUser(): void {
+    this.authService.user().subscribe(
+      data => {
+        localStorage.setItem('user',JSON.stringify(data))
+      });
+  }
+
+  logout(): void {
+    // Clear all stored user info from device.
+    localStorage.clear()
+    sessionStorage.clear()
+    this.isLoggedIn = false
+    this.authService.isLoggedIn = false
+    this.toastr.success('You are successfully logged out','Great')
+    this.router.navigate([''])
+  }
+
 }

@@ -2,23 +2,39 @@
         <h3>Voting made easy and secure.</h3>
         <div class="row">
           <div class="col-md-6">
-            <div class="confirm-registration">
+            <div  class="confirm-registration">
               <h4>See if you are registered to vote.</h4>
-              <div class="form-floating">
-                <input type="number" class="form-control" id="floatingInput" placeholder="">
-                <label for="floatingInput">South African ID Number</label>
+              <div *ngIf="registered !== true">
+                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                  <div class="form-floating">
+                    <input type="number" class="form-control" formControlName="idNumber" [ngClass]="{ 'is-invalid': submitted && f.idNumber.errors }" id="floatingInput" digitOnly pattern="[0-9]*" maxlength="13" placeholder="">
+                    <label for="floatingInput">South African ID Number</label>
+                  </div>
+                  <br>
+                  <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary btn-lg" type="submit">Verify</button>
+                  </div>
+                </form>
               </div>
-              <br>
-              <div class="d-grid gap-2">
-                <button type="button" class="btn btn-primary btn-lg" type="button">Verify</button>
-              </div>
+              
+            <div *ngIf="registered === true" class="alert alert-success" role="alert">
+              <h4 class="alert-heading">ID Registered!</h4>
+              <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                </symbol></svg>
+              <p>You are registered to vote</p>
+              <hr>
+              <p class="mb-0">login with id continue <a routerLink="login" class="btn btn-primary btn-lg">Login</a></p>
             </div>
+            </div>
+            
           </div>
           <div class="col-md-6">
             <div class="prompt-register">
               <h4>Not yet registered to vote?</h4>
               <p>Start Your Registration Now.</p>
-              <button type="button" class="btn btn-primary btn-lg" type="button">Register</button>
+              <a type="button" class="btn btn-primary btn-lg" routerLink="register">Register</a>
             </div>
           </div>
         </div>
