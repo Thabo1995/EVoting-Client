@@ -6,6 +6,7 @@ import { AuthService } from 'src/app/_services/auth.service';
 import { ViewChild, ElementRef} from '@angular/core';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { ToastrService } from 'ngx-toastr';
+import { VoteService } from 'src/app/_services/vote.service';
 
 @Component({
   selector: 'app-register',
@@ -26,9 +27,12 @@ export class RegisterComponent implements OnInit {
   information = true;
   verify = false
   finish = false
+  userId = null
+  event: any;
 
   constructor(
     private authService: AuthService,
+    private votingService:VoteService,
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
@@ -110,6 +114,7 @@ export class RegisterComponent implements OnInit {
       if (this.isLoggedIn === true){
         this.getUser()
         this.toastr.success('welcome to our platform','account registration successful')
+        this.registerToVote()
         return this.router.navigate(['vote'])
 
       }
@@ -134,7 +139,31 @@ export class RegisterComponent implements OnInit {
     this.authService.user().subscribe(
       data => {
         localStorage.setItem('user',JSON.stringify(data))
+        this.userId = data.pk
       });
+  }
+
+  registerToVote(): void {
+    let registerData = {
+      "voting_event": this.event,
+      "string": "nvjnvjnfvnjf",
+      "user": this.userId
+    }
+    this.votingService.registerVoting(registerData).subscribe(
+      data => {
+        if(data.user === this.userId){
+          console.log('in')
+        }
+        else {
+          this.toastr.error('something went wrong while confirming','oops')
+        }
+      });
+  }
+
+  getVotingEvent(){
+    if(localStorage.getItem('event')){
+      this.event = JSON.parse(localStorage.getItem('event')).id
+    }
   }
 
   logout(): void {

@@ -67,7 +67,7 @@ export class VoteService {
     );
   }
 
-  votingResults(username:string): Observable<any> {
+  votingResults(): Observable<any> {
     return this.http.get(apiUrl + '/voting-results/',httpOptions).pipe(
       tap(_ => console.log('>>')),
       catchError(this.handleError('register', []))

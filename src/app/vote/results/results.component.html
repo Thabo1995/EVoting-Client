@@ -1,1 +1,14 @@
-<p>results works!</p>
+<div>
+    <h3>Results..</h3>
+    <br><br>
+    <div class="row">
+        <div class="card-deck">
+      <div *ngFor="let party of results" class="card border-success mb-3" style="width: 10rem;">
+          <img src="http://localhost:8000/{{party.logo}}" class="card-img-top" height="130px"  alt="{{party.short_name}}">
+          <div class="card-body">
+              <h2>{{party.vote_percentage}} % </h2>
+           </div>
+        </div>
+       
+    </div>
+</div>
