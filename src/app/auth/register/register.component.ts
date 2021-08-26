@@ -27,7 +27,7 @@ export class RegisterComponent implements OnInit {
   information = true;
   verify = false
   finish = false
-  userId = null
+  userId:any;
   event: any;
 
   constructor(
@@ -49,6 +49,7 @@ export class RegisterComponent implements OnInit {
  }
 
   ngOnInit(): void {
+    this.getVotingEvent()
   }
 
   // convenience getter for easy access to form fields
@@ -114,7 +115,12 @@ export class RegisterComponent implements OnInit {
       if (this.isLoggedIn === true){
         this.getUser()
         this.toastr.success('welcome to our platform','account registration successful')
-        this.registerToVote()
+        setTimeout(() => 
+        {
+          this.registerToVote()
+        },
+        5000);
+        
         return this.router.navigate(['vote'])
 
       }
@@ -140,15 +146,18 @@ export class RegisterComponent implements OnInit {
       data => {
         localStorage.setItem('user',JSON.stringify(data))
         this.userId = data.pk
+        console.log(this.userId)
       });
   }
 
   registerToVote(): void {
     let registerData = {
-      "voting_event": this.event,
-      "string": "nvjnvjnfvnjf",
-      "user": this.userId
+      voting_event: this.event,
+      string: "nvjnvjnfvnjf",
+      user: this.userId
     }
+
+    console.log(registerData)
     this.votingService.registerVoting(registerData).subscribe(
       data => {
         if(data.user === this.userId){

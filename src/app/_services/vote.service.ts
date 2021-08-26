@@ -35,15 +35,17 @@ export class VoteService {
 
   
   registerVoting(registerData: object): Observable<any>{
-    return this.http.post(apiUrl + '/voting/register', registerData, httpOptions).pipe(
-      tap(_ => console.log('registered to vote'))
+    return this.http.post(apiUrl + '/voting/register/', registerData, httpOptions).pipe(
+      tap(_ => console.log('registered to vote')),
+      catchError(this.handleError('register-voter', []))
     );
   }
 
 
   registeredVoter(): Observable<any>{
     return this.http.get(apiUrl + '/voting/register/', httpOptions).pipe(
-      tap(_ => console.log('registered to vote'))
+      tap(_ => console.log('registered to vote')),
+      catchError(this.handleError('vote', []))
     );
   }
 
